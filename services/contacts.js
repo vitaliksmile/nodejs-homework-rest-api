@@ -3,22 +3,22 @@ const listContacts = async () => {
   const contacts = await Contact.find();
   return contacts;
 };
-const getContactById = async (contactId) => {
-  return await Contact.findOne({ _id: contactId });
+const getContactById = async (contactId, owner) => {
+  return await Contact.findOne({ _id: contactId, owner });
 };
-const removeContact = async (contactId) => {
-  return await Contact.findOneAndRemove({ _id: contactId });
+const removeContact = async (contactId, owner) => {
+  return await Contact.findOneAndRemove({ _id: contactId, owner });
 };
 const addContact = async (body) => {
   return await Contact.create(body);
 };
-const updateContact = async (contactId, body) => {
-  return await Contact.findOneAndUpdate({ _id: contactId }, body, {
+const updateContact = async (contactId, owner, body) => {
+  return await Contact.findOneAndUpdate({ _id: contactId, owner }, body, {
     new: true,
   });
 };
-const updateStatusContact = async (contactId, body) => {
-  return await Contact.findOneAndUpdate({ _id: contactId }, body, {
+const updateStatusContact = async (contactId, owner, body) => {
+  return await Contact.findOneAndUpdate({ _id: contactId, owner }, body, {
     new: true,
   });
 };
