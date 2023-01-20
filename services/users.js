@@ -1,14 +1,12 @@
-const {
-  User,
-  registerSchema,
-  loginSchema,
-  subscriptionSchema,
-} = require("./schemas/userSchema");
+const { User, registerSchema, loginSchema } = require("./schemas/userSchema");
+const gravatar = require("gravatar");
+const fs = require("fs").promises;
+const Jimp = require("jimp");
 
 const signup = async (req, res, next) => {
   const { email, password } = req.body;
   const { error } = registerSchema.validate(req.body);
-
+  const avatarUrl = gravatar.url(email);
   if (error) {
     res.status(400).json({
       status: "error",
@@ -30,8 +28,9 @@ const signup = async (req, res, next) => {
     });
     return;
   }
+
   try {
-    const newUser = new User({ email });
+    const newUser = new User({ email, avatarUrl });
     newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
@@ -40,6 +39,7 @@ const signup = async (req, res, next) => {
       user: {
         email,
         subscription: newUser.subscription,
+        avatarUrl,
       },
     });
   } catch (error) {
@@ -118,10 +118,20 @@ const updateSubscription = async (req, res) => {
     subscription: result.subscription,
   });
 };
+const updateAvatar = async (req, res, next) => {
+  const { _id } = req.user;
+  const { path } = req.file;
+  const result = await Jimp.read(path);
+  result.cover(250, 250).write(`public/avatars/${_id}`);
+  await fs.unlink(path);
+  await User.findByIdAndUpdate(_id, { avatarURL: `/avatars/${_id}` });
+  res.status(200).json({ avatarURL: `/avatars/${_id}` });
+};
 module.exports = {
   signup,
   login,
   logout,
   getCurrent,
   updateSubscription,
+  updateAvatar,
 };
