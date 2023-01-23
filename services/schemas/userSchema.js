@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Joi = require("joi");
+
 const userSchema = new mongoose.Schema({
   password: {
     type: String,
@@ -15,6 +16,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["starter", "pro", "business"],
     default: "starter",
+  },
+  avatarURL: {
+    type: String,
+  },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: [true, "Verify token is required"],
   },
   token: String,
 });
